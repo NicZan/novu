@@ -71,4 +71,55 @@ services:
 
   - type: web
     name: web
-    runtime
+    runtime: docker
+    image: 'ghcr.io/novuhq/novu/web:0.21.0'
+    envVars:
+      - key: NODE_ENV
+        value: ${NODE_ENV}
+      - key: API_ROOT_URL
+        value: ${API_ROOT_URL}
+      # Adicione outras variáveis de ambiente conforme necessário para o serviço Web
+    plan: starter
+    startCommand: ["npm", "start"]
+    dependsOn:
+      - api
+      - worker
+
+  - type: web
+    name: widget
+    runtime: docker
+    image: 'ghcr.io/novuhq/novu/widget:0.21.0'
+    envVars:
+      - key: NODE_ENV
+        value: ${NODE_ENV}
+      - key: API_ROOT_URL
+        value: ${API_ROOT_URL}
+      # Adicione outras variáveis de ambiente conforme necessário para o serviço Widget
+    plan: starter
+    startCommand: ["npm", "start"]
+    dependsOn:
+      - api
+      - worker
+      - web
+
+  - type: web
+    name: embed
+    runtime: docker
+    image: 'ghcr.io/novuhq/novu/embed:0.21.0'
+    envVars:
+      - key: WIDGET_URL
+        value: ${WIDGET_URL}
+      # Adicione outras variáveis de ambiente conforme necessário para o serviço Embed
+    plan: starter
+    startCommand: ["npm", "start"]
+    dependsOn:
+      - widget
+
+databases:
+  - name: mongodb
+    ipAllowList: []
+    # Adicione outras configurações específicas do banco de dados conforme necessário
+
+envVarGroups:
+  # Adicione grupos de variáveis de ambiente se necessário para a aplicação
+
