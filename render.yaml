@@ -122,4 +122,3 @@ databases:
 
 envVarGroups:
   # Adicione grupos de variáveis de ambiente se necessário para a aplicação
-
