@@ -1,6 +1,6 @@
 services:
   - name: redis
-    env: {}
+    env: 
     plan: starter
     image: 'redis:alpine'
     startCommand: ["redis-server"]
