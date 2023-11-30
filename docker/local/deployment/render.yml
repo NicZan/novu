@@ -1,0 +1,86 @@
+services:
+  - name: redis
+    env: {}
+    plan: starter
+    image: 'redis:alpine'
+    startCommand: ["redis-server"]
+  
+  - name: mongodb
+    env:
+      - PUID=1000
+      - PGID=1000
+    plan: starter
+    image: mongo
+    startCommand: ["mongod", "--bind_ip_all"]
+    ports:
+      - 27017
+
+  - name: api
+    env:
+      - NODE_ENV=${NODE_ENV}
+      # Adicione aqui as outras variáveis de ambiente necessárias para o serviço API
+    plan: starter
+    image: 'ghcr.io/novuhq/novu/api:0.21.0'
+    startCommand: ["npm", "start"]
+    ports:
+      - 3000
+    dependsOn:
+      - mongodb
+      - redis
+
+  - name: worker
+    env:
+      - NODE_ENV=${NODE_ENV}
+      # Adicione aqui as outras variáveis de ambiente necessárias para o serviço Worker
+    plan: starter
+    image: 'ghcr.io/novuhq/novu/worker:0.21.0'
+    startCommand: ["npm", "start"]
+    # Adicione aqui as portas ou outras configurações necessárias para o serviço Worker
+    dependsOn:
+      - mongodb
+      - redis
+
+  - name: ws
+    env:
+      - NODE_ENV=${NODE_ENV}
+      # Adicione aqui as outras variáveis de ambiente necessárias para o serviço WS
+    plan: starter
+    image: 'ghcr.io/novuhq/novu/ws:0.21.0'
+    startCommand: ["npm", "start"]
+    # Adicione aqui as portas ou outras configurações necessárias para o serviço WS
+    dependsOn:
+      - mongodb
+      - redis
+
+  - name: web
+    env:
+      # Adicione aqui as variáveis de ambiente necessárias para o serviço Web
+    plan: starter
+    image: 'ghcr.io/novuhq/novu/web:0.21.0'
+    startCommand: ["npm", "start"]
+    # Adicione aqui as portas ou outras configurações necessárias para o serviço Web
+    dependsOn:
+      - api
+      - worker
+
+  - name: widget
+    env:
+      # Adicione aqui as variáveis de ambiente necessárias para o serviço Widget
+    plan: starter
+    image: 'ghcr.io/novuhq/novu/widget:0.21.0'
+    startCommand: ["npm", "start"]
+    # Adicione aqui as portas ou outras configurações necessárias para o serviço Widget
+    dependsOn:
+      - api
+      - worker
+      - web
+
+  - name: embed
+    env:
+      # Adicione aqui as variáveis de ambiente necessárias para o serviço Embed
+    plan: starter
+    image: 'ghcr.io/novuhq/novu/embed:0.21.0'
+    startCommand: ["npm", "start"]
+    # Adicione aqui as portas ou outras configurações necessárias para o serviço Embed
+    dependsOn:
+      - widget
