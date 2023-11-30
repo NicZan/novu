@@ -1,11 +1,13 @@
 services:
   - name: redis
-    env: 
+    type: web
+    env: {}
     plan: starter
     image: 'redis:alpine'
     startCommand: ["redis-server"]
-  
+
   - name: mongodb
+    type: web
     env:
       - PUID=1000
       - PGID=1000
@@ -16,9 +18,11 @@ services:
       - 27017
 
   - name: api
+    type: web
     env:
       - NODE_ENV=${NODE_ENV}
-      # Adicione aqui as outras variáveis de ambiente necessárias para o serviço API
+      - API_ROOT_URL=${API_ROOT_URL}
+      # Adicione aqui outras variáveis de ambiente necessárias para o serviço API
     plan: starter
     image: 'ghcr.io/novuhq/novu/api:0.21.0'
     startCommand: ["npm", "start"]
@@ -29,58 +33,65 @@ services:
       - redis
 
   - name: worker
+    type: web
     env:
       - NODE_ENV=${NODE_ENV}
-      # Adicione aqui as outras variáveis de ambiente necessárias para o serviço Worker
+      - MONGO_URL=${MONGO_URL}
+      # Adicione aqui outras variáveis de ambiente necessárias para o serviço Worker
     plan: starter
     image: 'ghcr.io/novuhq/novu/worker:0.21.0'
     startCommand: ["npm", "start"]
-    # Adicione aqui as portas ou outras configurações necessárias para o serviço Worker
     dependsOn:
       - mongodb
       - redis
 
   - name: ws
+    type: web
     env:
       - NODE_ENV=${NODE_ENV}
-      # Adicione aqui as outras variáveis de ambiente necessárias para o serviço WS
+      - MONGO_URL=${MONGO_URL}
+      # Adicione aqui outras variáveis de ambiente necessárias para o serviço WS
     plan: starter
     image: 'ghcr.io/novuhq/novu/ws:0.21.0'
     startCommand: ["npm", "start"]
-    # Adicione aqui as portas ou outras configurações necessárias para o serviço WS
     dependsOn:
       - mongodb
       - redis
 
   - name: web
+    type: web
     env:
-      # Adicione aqui as variáveis de ambiente necessárias para o serviço Web
+      - NODE_ENV=${NODE_ENV}
+      - API_ROOT_URL=${API_ROOT_URL}
+      # Adicione aqui outras variáveis de ambiente necessárias para o serviço Web
     plan: starter
     image: 'ghcr.io/novuhq/novu/web:0.21.0'
     startCommand: ["npm", "start"]
-    # Adicione aqui as portas ou outras configurações necessárias para o serviço Web
     dependsOn:
       - api
       - worker
 
   - name: widget
+    type: web
     env:
-      # Adicione aqui as variáveis de ambiente necessárias para o serviço Widget
+      - NODE_ENV=${NODE_ENV}
+      - API_ROOT_URL=${API_ROOT_URL}
+      # Adicione aqui outras variáveis de ambiente necessárias para o serviço Widget
     plan: starter
     image: 'ghcr.io/novuhq/novu/widget:0.21.0'
     startCommand: ["npm", "start"]
-    # Adicione aqui as portas ou outras configurações necessárias para o serviço Widget
     dependsOn:
       - api
       - worker
       - web
 
   - name: embed
+    type: web
     env:
-      # Adicione aqui as variáveis de ambiente necessárias para o serviço Embed
+      - WIDGET_URL=${WIDGET_URL}
+      # Adicione aqui outras variáveis de ambiente necessárias para o serviço Embed
     plan: starter
     image: 'ghcr.io/novuhq/novu/embed:0.21.0'
     startCommand: ["npm", "start"]
-    # Adicione aqui as portas ou outras configurações necessárias para o serviço Embed
     dependsOn:
       - widget
