@@ -97,7 +97,6 @@ fabric.properties
 # Module directory
 .terraform/
 
-.env
 .vercel
 
 .pnpm-store/
