@@ -98,7 +98,6 @@ fabric.properties
 .terraform/
 
 .env
-docker/.env
 .vercel
 
 .pnpm-store/
